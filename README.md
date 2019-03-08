@@ -65,9 +65,9 @@ Output HTML is printed, so you'll want to pipe it into a file.
 - Stick to inline styles; many clients discard `style` tags entirely.
     - Speaking of styles, Gmail doesn't appear to like single-quotes in CSS. It
         seems to throw away the _entire_ `style` attribute if it contains one.
-- Even using them seems like a good idea, base64 images have mediocre support
-    and don't work very well in Gmail. I'm hosting images on Runciman instead.
-    (I wouldn't need to if Gmail supported SVG...)
+- Even though using them seems like a good idea, base64 images have mediocre 
+    support and don't work very well in Gmail. I'm hosting images on Runciman 
+    instead. (I wouldn't need to if Gmail supported SVG...)
 - iOS deserves extra testing, as it can sometimes decide that an email should
     be a different size and shift everything to one side, leaving a big ugly
     white gap. If you'd like to test efficiently, start a Litmus trial.
