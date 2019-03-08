@@ -1,0 +1,13 @@
+GEM
+  remote: http://rubygems.org/
+  specs:
+    redcarpet (3.4.0)
+
+PLATFORMS
+  ruby
+
+DEPENDENCIES
+  redcarpet
+
+BUNDLED WITH
+   2.0.1
