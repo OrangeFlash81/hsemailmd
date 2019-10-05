@@ -81,8 +81,11 @@ Document = Struct.new('Document', :sections) do
   end
 end
 
-if ARGV.length != 1
-  puts "Usage: hsemailmd.rb <filename>"
-else 
-  puts Document.from_text(File.read(ARGV[0])).render
+if ARGV.length != 1 && ARGV.length != 2
+  puts "Usage: hsemailmd.rb <input-file> [output-file]"
+  exit
 end
+
+content = Document.from_text(File.read(ARGV[0])).render
+filename = ARGV[1] || "#{ARGV[0].gsub(/(.*)\.([^\/]+)$/, '\1')}.html" # cursed regex to remove file extension
+File.write(filename, content)

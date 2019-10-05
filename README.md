@@ -47,10 +47,11 @@ Use this as a command-line tool with one argument, the document to compile.
 After running `chmod +x hsemailmd.rb`, you can use this tool like so:
 
 ```
-./hsemailmd.rb <filename>
+./hsemailmd.rb <input-file> [output-file]
 ```
 
-Output HTML is printed, so you'll want to pipe it into a file.
+The output file argument is optional, and defaults to "x.html" for a file
+"x.md".
 
 ## Things about emails
 
