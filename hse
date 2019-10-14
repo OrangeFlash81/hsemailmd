@@ -1,0 +1,248 @@
+#!/usr/bin/env ruby
+require 'redcarpet'
+require 'json'
+require 'open-uri'
+require 'active_support/all'
+require 'rainbow/refinement'
+using Rainbow
+
+EVENT_NAMES = {
+  'Boardgames and Cake' => 'Board Games and Cake'
+}
+
+EVENT_DESCRIPTIONS = {
+  'CoffeeScript' => 'Our weekly social on Hes East; enjoy some lunch and have a good chat.',
+  'Board Games and Cake' => "One of HackSoc's oldest traditions, where we play many board games and eat plenty of cake! Members are encouraged to bring their own board games and cake if they enjoy the events.",
+  'HackPub' => 'Join us in the Rook and Gaskill and chat to members past and present over a pint (of something non-alcoholic, if you so desire).',
+  'Film Night' => 'Come and enjoy a film with fellow HackSoc members! Film suggestions are always welcome on Slack.'
+}
+
+# Prints a message and terminates with an error code.
+def die(x=nil)
+  puts x
+  exit 1
+end
+
+# Converts a given command-line file path to item inside "/emails".
+def arg_to_filepath(x)
+  if x == 'latest'
+    # TODO: handle multiple emails with the same date
+    "emails/#{Dir.entries('emails').sort.last}"
+  elsif x.include?('.')
+    # If the path contains a dot, assume it's a name
+    x
+  else
+    "emails/#{x}.md"
+  end
+end
+
+# Custom Redcarpet renderer with special <hr> styles.
+class HackSocRender < Redcarpet::Render::HTML
+  def hrule
+    %(<hr style="margin: 5px 20px 5px 20px; height: 1px; border: none; background-color: #CCC;" />)
+  end
+end
+
+# Handles loading section and document templates.
+class TemplateManager
+  TEMPLATE_DIR = "parts"
+
+  @@template_cache = {}
+
+  # Fetches a template from the directory by its name, using a cached version
+  # if available, and caching the template if it was not already cached.
+  def self.load_template(name)
+    @@template_cache[name] ||= File.read("#{TEMPLATE_DIR}/#{name}")
+  rescue Errno::ENOENT
+    raise "a template is missing: #{TEMPLATE_DIR}/#{name}"
+  end
+
+  # Create method to access the three required templates: after, before and
+  # section.
+  class << self
+    [:after, :before, :section].each do |temp|
+      define_method(temp) do
+        self.load_template("#{temp}.html")
+      end
+    end
+  end
+end
+
+# Represents a section with a plaintext title and Markdown body.
+Section = Struct.new('Section', :title, :body) do
+  # Renders the section into HTML.
+  def render
+    markdown = Redcarpet::Markdown.new(HackSocRender.new)
+    rendered_body = markdown.render(body)
+
+    TemplateManager.section.gsub("%%BODY%%", rendered_body).gsub("%%TITLE%%", title)
+  end
+end
+
+# A document with any number of sections.
+Document = Struct.new('Document', :sections) do
+  # Creates a Document instance from the markup language described in README.
+  def self.from_text(text)
+    sections = []
+
+    current_title = nil
+    current_body = ""
+    text.split("\n").each do |line|
+      # If we get a new section title, use the current title and body to
+      # instantiate a Section, then set the section title and reset the body
+      if /^%(.+)$/ === line
+        next_section_title = $1.strip
+
+        sections << Section.new(current_title, current_body) unless current_title.nil?
+        current_title = next_section_title
+        current_body = ""
+      else
+        current_body += "#{line}\n"
+      end
+    end
+
+    # Add the final section
+    # (It was never added to the sections array because no section followed it)
+    sections << Section.new(current_title, current_body)
+
+    Document.new(sections)
+  end
+
+  # Renders the document into HTML.
+  def render
+    markdown = Redcarpet::Markdown.new(HackSocRender.new)
+    TemplateManager.before + sections.map(&:render).inject(:+) + TemplateManager.after
+  end
+end
+
+command = ARGV[0]
+case command
+when 'new'
+  puts "Enter the " + "name".yellow + " of this email, in-this-format."
+  name = nil
+  loop do
+    print "> ".black.bright
+    name = STDIN.gets.chomp
+    if name.strip == ''
+      puts "Please enter a name.".red 
+    elsif name.include?(' ')
+      puts "The name cannot contain spaces.".red
+    elsif name.include?('.')
+      puts "The name cannot contain dots.".red
+    else
+      break
+    end
+  end
+
+  puts "Enter the " + "date when you plan to send this email".yellow + ", YYYY-MM-DD."
+  date = nil
+  loop do
+    print "> ".black.bright
+    date = STDIN.gets.chomp
+    if /^\d{4}-\d{2}-\d{2}$/ === date
+      break
+    else
+      puts "Please use the format YYYY-MM-DD.".red
+    end
+  end
+
+  puts "Is this a " + "newsletter".yellow + "? (Y/N)"
+  is_newsletter = nil
+  loop do
+    print "> ".black.bright
+    is_newsletter_str = STDIN.gets.chomp
+    if is_newsletter_str.upcase == 'N'
+      is_newsletter = false
+      break
+    elsif is_newsletter_str.upcase == 'Y'
+      is_newsletter = true
+      break
+    else
+      puts "Please enter Y or N.".red
+    end
+  end
+
+  path = "emails/#{date}-#{name}.md"
+  die "An email with this name and date already exists.".red if File.exist?(path)
+  File.write(path, '')
+  puts "Email created!".green
+
+  if is_newsletter
+    puts "Finding events for the week of #{date}..."
+    year, month, day = date.split('-').map(&:to_i)
+    date_obj = Date.new(year, month, day)
+
+    events = JSON.parse(open("https://api.hacksoc.org/calendar/events/#{year}/#{month}").read)
+    events_this_week = []
+    events.each do |event|
+      event_day, event_month, event_year = event['when_human']['short_start_date'].split('/').map(&:to_i)
+      event_date_obj = Date.new(event_year, event_month, event_day)
+
+      distance = (event_date_obj - date_obj.at_beginning_of_week).to_i
+      next unless distance >= 0 && distance < 7
+
+      event_name = EVENT_NAMES[event['summary']] || event['summary']
+      event_description = EVENT_DESCRIPTIONS[event_name] || event['description']
+      # TODO: use am/pm time
+      event_time = event['when_human']['start_time']
+      event_weekday = event['when_human']['long_start_date'][0...3]
+
+      events_this_week << \
+        "**#{event_name}** - _#{event_time}, #{event_weekday} #{event_day}/#{event_month}_ - _#{event['location']}_\n\n#{event_description}"
+    end
+
+    puts "There are #{events_this_week.length} events this week."
+
+    email_contents = <<HERE
+% Hello, HackSoc!
+
+XXXXXXXX
+
+% The Calendar
+
+#{events_this_week.join("\n\n---\n\n")}
+
+% And Finally...
+
+Make sure you're in HackSoc's Slack workspace! We have over 100 members, and
+it's free to join the conversation, so
+[sign up now](https://hacksoc-york.slack.com/)!
+
+If you'd like to become a member of the society, simply 
+[sign up here](https://yusu.org/activities/view/hacksoc)! If you
+aren't sure yet, we'd love you to come along to any of our events and chat to
+us. If you have any questions, get in touch over social media or Slack!
+
+Have a great week,
+
+Aaron 🤖
+HERE
+    File.write(path, email_contents)
+    puts "Added newsletter template!".green
+  end
+when 'build'
+  die "Usage: #{ARGV[0]} build (input | 'latest') [output]" if ARGV.length < 2
+    
+  input_filepath = arg_to_filepath(ARGV[1])
+  content = Document.from_text(File.read(input_filepath)).render
+  output_filepath = ARGV[2] || "#{input_filepath.gsub(/(.*)\.([^\/]+)$/, '\1')}.html" # cursed regex to remove file extension
+  File.write(output_filepath, content)
+
+  puts "Built email ".green + input_filepath + " to ".green + output_filepath
+else
+  puts [
+    "    ****    ".magenta,
+    "  ********  ".magenta,
+    " ***".magenta + "\\".white + "****** ".magenta + " The HackSoc",
+    " ***".magenta + "/\\".white + "\\/".magenta.bright + "*** ".magenta + " Email Toolchain",
+    "  ****".magenta + "/".magenta.bright + "***  ".magenta + " By Aaron Christiansen".black.bright,
+    "    ****    ".magenta,
+    "",
+    "Commands".underline,
+    "  - " + "new".blue.bright + " - Create a new Markdown email with calendar events",
+    "  - " + "build".blue.bright + " - Build a Markdown email to HTML",
+    "  - " + "open".blue.bright + " - Build an email and open it in a browser",
+    "  - " + "text".blue.bright + " - Build an email and convert it to text",
+    "  - " + "publish".blue.bright + " - Build an email and create a draft on hack@yusu.org"
+  ]
+end
