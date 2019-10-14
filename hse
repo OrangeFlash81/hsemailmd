@@ -6,6 +6,8 @@ require 'active_support/all'
 require 'rainbow/refinement'
 using Rainbow
 
+require_relative 'src/templating/document'
+
 EVENT_NAMES = {
   'Boardgames and Cake' => 'Board Games and Cake'
 }
@@ -17,12 +19,6 @@ EVENT_DESCRIPTIONS = {
   'Film Night' => 'Come and enjoy a film with fellow HackSoc members! Film suggestions are always welcome on Slack.'
 }
 
-# Prints a message and terminates with an error code.
-def die(x=nil)
-  puts x
-  exit 1
-end
-
 # Converts a given command-line file path to item inside "/emails".
 def arg_to_filepath(x)
   if x == 'latest'
@@ -33,13 +29,6 @@ def arg_to_filepath(x)
     x
   else
     "emails/#{x}.md"
-  end
-end
-
-# Custom Redcarpet renderer with special <hr> styles.
-class HackSocRender < Redcarpet::Render::HTML
-  def hrule
-    %(<hr style="margin: 5px 20px 5px 20px; height: 1px; border: none; background-color: #CCC;" />)
   end
 end
 
@@ -65,53 +54,6 @@ class TemplateManager
         self.load_template("#{temp}.html")
       end
     end
-  end
-end
-
-# Represents a section with a plaintext title and Markdown body.
-Section = Struct.new('Section', :title, :body) do
-  # Renders the section into HTML.
-  def render
-    markdown = Redcarpet::Markdown.new(HackSocRender.new)
-    rendered_body = markdown.render(body)
-
-    TemplateManager.section.gsub("%%BODY%%", rendered_body).gsub("%%TITLE%%", title)
-  end
-end
-
-# A document with any number of sections.
-Document = Struct.new('Document', :sections) do
-  # Creates a Document instance from the markup language described in README.
-  def self.from_text(text)
-    sections = []
-
-    current_title = nil
-    current_body = ""
-    text.split("\n").each do |line|
-      # If we get a new section title, use the current title and body to
-      # instantiate a Section, then set the section title and reset the body
-      if /^%(.+)$/ === line
-        next_section_title = $1.strip
-
-        sections << Section.new(current_title, current_body) unless current_title.nil?
-        current_title = next_section_title
-        current_body = ""
-      else
-        current_body += "#{line}\n"
-      end
-    end
-
-    # Add the final section
-    # (It was never added to the sections array because no section followed it)
-    sections << Section.new(current_title, current_body)
-
-    Document.new(sections)
-  end
-
-  # Renders the document into HTML.
-  def render
-    markdown = Redcarpet::Markdown.new(HackSocRender.new)
-    TemplateManager.before + sections.map(&:render).inject(:+) + TemplateManager.after
   end
 end
 
@@ -224,7 +166,7 @@ when 'build'
   die "Usage: #{ARGV[0]} build (input | 'latest') [output]" if ARGV.length < 2
     
   input_filepath = arg_to_filepath(ARGV[1])
-  content = Document.from_text(File.read(input_filepath)).render
+  content = HSE::Templating::Document.from_text(File.read(input_filepath)).render
   output_filepath = ARGV[2] || "#{input_filepath.gsub(/(.*)\.([^\/]+)$/, '\1')}.html" # cursed regex to remove file extension
   File.write(output_filepath, content)
 
