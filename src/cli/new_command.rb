@@ -31,14 +31,12 @@ module HSE
 
       if is_newsletter
         puts "Finding events for the week of #{date}..."
-        year, month, day = date.split('-').map(&:to_i)
-        date_obj = Date.new(year, month, day)
+        date_obj = parse_date(date)
 
-        events = JSON.parse(open("https://api.hacksoc.org/calendar/events/#{year}/#{month}").read)
+        events = JSON.parse(open("https://api.hacksoc.org/calendar/events/#{date_obj.year}/#{date_obj.month}").read)
         events_this_week = []
         events.each do |event|
-          event_day, event_month, event_year = event['when_human']['short_start_date'].split('/').map(&:to_i)
-          event_date_obj = Date.new(event_year, event_month, event_day)
+          event_date_obj = parse_date(event['when_human']['short_start_date'])
 
           distance = (event_date_obj - date_obj.at_beginning_of_week).to_i
           next unless distance >= 0 && distance < 7
@@ -50,7 +48,9 @@ module HSE
           event_weekday = event['when_human']['long_start_date'][0...3]
 
           events_this_week << \
-            "**#{event_name}** - _#{event_time}, #{event_weekday} #{event_day}/#{event_month}_ - _#{event['location']}_\n\n#{event_description}"
+            "**#{event_name}** - _#{event_time}, #{event_weekday} " \
+            "#{event_date_obj.day}/#{event_date_obj.month}_ - " \
+            "_#{event['location']}_\n\n#{event_description}"
         end
 
         puts "There are #{events_this_week.length} events this week."

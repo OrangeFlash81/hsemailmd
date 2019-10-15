@@ -51,6 +51,18 @@ module HSE
         end
       end
 
+      def parse_date(date_str)
+        # Parse YYYY-MM-DD and DD-MM-YYYY, with - or / as separators
+        case date_str
+        when /^(\d{2})(?:-|\/)(\d{2})(?:-|\/)(\d{4})$/
+          Date.new($3.to_i, $2.to_i, $1.to_i)
+        when /^(\d{4})(?:-|\/)(\d{2})(?:-|\/)(\d{2})$/
+          Date.new($1.to_i, $2.to_i, $3.to_i)
+        else
+          raise 'invalid date format'
+        end
+      end
+
       # Converts a given command-line file path to item inside "/emails".
       def arg_to_filepath(x)
         if x == 'latest'
