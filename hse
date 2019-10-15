@@ -11,21 +11,7 @@ require_relative 'src/cli/command'
 require_relative 'src/cli/build_command'
 require_relative 'src/cli/new_command'
 
-EVENT_NAMES = {
-  'Boardgames and Cake' => 'Board Games and Cake'
-}
-
-EVENT_DESCRIPTIONS = {
-  'CoffeeScript' => 'Our weekly social on Hes East; enjoy some lunch and have a good chat.',
-  'Board Games and Cake' => "One of HackSoc's oldest traditions, where we play many board games and eat plenty of cake! Members are encouraged to bring their own board games and cake if they enjoy the events.",
-  'HackPub' => 'Join us in the Rook and Gaskill and chat to members past and present over a pint (of something non-alcoholic, if you so desire).',
-  'Film Night' => 'Come and enjoy a film with fellow HackSoc members! Film suggestions are always welcome on Slack.'
-}
-
-COMMANDS = [
-  HSE::CLI::NewCommand,
-  HSE::CLI::BuildCommand,
-]
+require_relative 'src/config'
 
 command = ARGV[0]
 commands_hash = COMMANDS.map { |x| [x.name, x] }.to_h
