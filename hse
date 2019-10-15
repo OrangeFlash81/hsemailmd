@@ -1,13 +1,15 @@
 #!/usr/bin/env ruby
 require 'redcarpet'
-require 'json'
-require 'open-uri'
 require 'active_support/all'
 require 'rainbow/refinement'
 using Rainbow
 
 require_relative 'src/templating/document'
 require_relative 'src/templating/template_manager'
+
+require_relative 'src/cli/command'
+require_relative 'src/cli/build_command'
+require_relative 'src/cli/new_command'
 
 EVENT_NAMES = {
   'Boardgames and Cake' => 'Board Games and Cake'
@@ -20,133 +22,15 @@ EVENT_DESCRIPTIONS = {
   'Film Night' => 'Come and enjoy a film with fellow HackSoc members! Film suggestions are always welcome on Slack.'
 }
 
-# Converts a given command-line file path to item inside "/emails".
-def arg_to_filepath(x)
-  if x == 'latest'
-    # TODO: handle multiple emails with the same date
-    "emails/#{Dir.entries('emails').sort.last}"
-  elsif x.include?('.')
-    # If the path contains a dot, assume it's a name
-    x
-  else
-    "emails/#{x}.md"
-  end
-end
+COMMANDS = [
+  HSE::CLI::NewCommand,
+  HSE::CLI::BuildCommand,
+]
 
 command = ARGV[0]
-case command
-when 'new'
-  puts "Enter the " + "name".yellow + " of this email, in-this-format."
-  name = nil
-  loop do
-    print "> ".black.bright
-    name = STDIN.gets.chomp
-    if name.strip == ''
-      puts "Please enter a name.".red 
-    elsif name.include?(' ')
-      puts "The name cannot contain spaces.".red
-    elsif name.include?('.')
-      puts "The name cannot contain dots.".red
-    else
-      break
-    end
-  end
-
-  puts "Enter the " + "date when you plan to send this email".yellow + ", YYYY-MM-DD."
-  date = nil
-  loop do
-    print "> ".black.bright
-    date = STDIN.gets.chomp
-    if /^\d{4}-\d{2}-\d{2}$/ === date
-      break
-    else
-      puts "Please use the format YYYY-MM-DD.".red
-    end
-  end
-
-  puts "Is this a " + "newsletter".yellow + "? (Y/N)"
-  is_newsletter = nil
-  loop do
-    print "> ".black.bright
-    is_newsletter_str = STDIN.gets.chomp
-    if is_newsletter_str.upcase == 'N'
-      is_newsletter = false
-      break
-    elsif is_newsletter_str.upcase == 'Y'
-      is_newsletter = true
-      break
-    else
-      puts "Please enter Y or N.".red
-    end
-  end
-
-  path = "emails/#{date}-#{name}.md"
-  die "An email with this name and date already exists.".red if File.exist?(path)
-  File.write(path, '')
-  puts "Email created!".green
-
-  if is_newsletter
-    puts "Finding events for the week of #{date}..."
-    year, month, day = date.split('-').map(&:to_i)
-    date_obj = Date.new(year, month, day)
-
-    events = JSON.parse(open("https://api.hacksoc.org/calendar/events/#{year}/#{month}").read)
-    events_this_week = []
-    events.each do |event|
-      event_day, event_month, event_year = event['when_human']['short_start_date'].split('/').map(&:to_i)
-      event_date_obj = Date.new(event_year, event_month, event_day)
-
-      distance = (event_date_obj - date_obj.at_beginning_of_week).to_i
-      next unless distance >= 0 && distance < 7
-
-      event_name = EVENT_NAMES[event['summary']] || event['summary']
-      event_description = EVENT_DESCRIPTIONS[event_name] || event['description']
-      # TODO: use am/pm time
-      event_time = event['when_human']['start_time']
-      event_weekday = event['when_human']['long_start_date'][0...3]
-
-      events_this_week << \
-        "**#{event_name}** - _#{event_time}, #{event_weekday} #{event_day}/#{event_month}_ - _#{event['location']}_\n\n#{event_description}"
-    end
-
-    puts "There are #{events_this_week.length} events this week."
-
-    email_contents = <<HERE
-% Hello, HackSoc!
-
-XXXXXXXX
-
-% The Calendar
-
-#{events_this_week.join("\n\n---\n\n")}
-
-% And Finally...
-
-Make sure you're in HackSoc's Slack workspace! We have over 100 members, and
-it's free to join the conversation, so
-[sign up now](https://hacksoc-york.slack.com/)!
-
-If you'd like to become a member of the society, simply 
-[sign up here](https://yusu.org/activities/view/hacksoc)! If you
-aren't sure yet, we'd love you to come along to any of our events and chat to
-us. If you have any questions, get in touch over social media or Slack!
-
-Have a great week,
-
-Aaron 🤖
-HERE
-    File.write(path, email_contents)
-    puts "Added newsletter template!".green
-  end
-when 'build'
-  die "Usage: #{ARGV[0]} build (input | 'latest') [output]" if ARGV.length < 2
-    
-  input_filepath = arg_to_filepath(ARGV[1])
-  content = HSE::Templating::Document.from_text(File.read(input_filepath)).render
-  output_filepath = ARGV[2] || "#{input_filepath.gsub(/(.*)\.([^\/]+)$/, '\1')}.html" # cursed regex to remove file extension
-  File.write(output_filepath, content)
-
-  puts "Built email ".green + input_filepath + " to ".green + output_filepath
+commands_hash = COMMANDS.map { |x| [x.name, x] }.to_h
+if commands_hash[command]
+  commands_hash[command].run(ARGV[1..-1])
 else
   puts [
     "    ****    ".magenta,
@@ -157,10 +41,5 @@ else
     "    ****    ".magenta,
     "",
     "Commands".underline,
-    "  - " + "new".blue.bright + " - Create a new Markdown email with calendar events",
-    "  - " + "build".blue.bright + " - Build a Markdown email to HTML",
-    "  - " + "open".blue.bright + " - Build an email and open it in a browser",
-    "  - " + "text".blue.bright + " - Build an email and convert it to text",
-    "  - " + "publish".blue.bright + " - Build an email and create a draft on hack@yusu.org"
-  ]
+  ] + COMMANDS.map(&:help_line)
 end
