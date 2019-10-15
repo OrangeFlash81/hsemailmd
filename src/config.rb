@@ -22,4 +22,5 @@ EVENT_DESCRIPTIONS = {
 COMMANDS = [
   HSE::CLI::NewCommand,
   HSE::CLI::BuildCommand,
+  HSE::CLI::OpenCommand
 ]
