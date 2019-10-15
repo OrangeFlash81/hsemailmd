@@ -93,12 +93,17 @@ module HSE
 
       # Converts a given command-line file path to item inside "/emails".
       # @param [String] x The given file path to convert.
+      # @param [String, Symbol] format The file extension to use for the path.
       # @return [String] A relative path to an email. This is not guaranteed to
       #   point to a file which actually exists.
-      def arg_to_filepath(x)
+      def arg_to_filepath(x, format=:md)
         if x == 'latest'
           # TODO: handle multiple emails with the same date
-          "emails/#{Dir.entries('emails').sort.last}"
+          email_mds = Dir.entries('emails').select { |x| x.end_with?('.md') }
+          latest = email_mds.sort.last
+          latest = "#{latest[0...-3]}.#{format}" if format != :md
+
+          result = "emails/#{latest}"
         elsif x.include?('.')
           # If the path contains a dot, assume it's a name
           x
