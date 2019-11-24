@@ -5,7 +5,7 @@
 # When creating a newsletter, events will have their name overridden if there is
 # a key of their original name.
 EVENT_NAMES = {
-  'Boardgames and Cake' => 'Board Games and Cake'
+  'Boardgames & Cake' => 'Board Games and Cake'
 }
 
 # When creating a newsletter, events will have their description overridden if 
@@ -18,9 +18,15 @@ EVENT_DESCRIPTIONS = {
   'Film Night' => 'Come and enjoy a film with fellow HackSoc members! Film suggestions are always welcome on Slack.'
 }
 
+# Custom words which the linter's spell checker specifically allows.
+LINT_CUSTOM_WORDS = %w[
+  HackSoc RCH Lakehouse
+]
+
 # The commands available in the CLI.
 COMMANDS = [
   HSE::CLI::NewCommand,
   HSE::CLI::BuildCommand,
-  HSE::CLI::OpenCommand
+  HSE::CLI::LintCommand,
+  HSE::CLI::OpenCommand,
 ]

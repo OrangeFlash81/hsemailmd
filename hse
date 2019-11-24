@@ -8,6 +8,7 @@ require_relative 'src/templating/document'
 require_relative 'src/templating/template_manager'
 
 require_relative 'src/cli/command'
+require_relative 'src/cli/lint_command'
 require_relative 'src/cli/build_command'
 require_relative 'src/cli/open_command'
 require_relative 'src/cli/new_command'
