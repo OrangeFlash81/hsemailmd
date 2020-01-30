@@ -4,14 +4,15 @@ require 'active_support/all'
 require 'rainbow/refinement'
 using Rainbow
 
-require_relative 'src/templating/document'
-require_relative 'src/templating/template_manager'
+require_relative 'src/email_templating/document'
+require_relative 'src/email_templating/template_manager'
 
 require_relative 'src/cli/command'
-require_relative 'src/cli/lint_command'
-require_relative 'src/cli/build_command'
-require_relative 'src/cli/open_command'
-require_relative 'src/cli/new_command'
+
+require_relative 'src/cli/email/lint_command'
+require_relative 'src/cli/email/build_command'
+require_relative 'src/cli/email/open_command'
+require_relative 'src/cli/email/new_command'
 
 require_relative 'src/config'
 
@@ -24,7 +25,7 @@ else
     "    ****    ".magenta,
     "  ********  ".magenta,
     " ***".magenta + "\\".white + "****** ".magenta + " The HackSoc",
-    " ***".magenta + "/\\".white + "\\/".magenta.bright + "*** ".magenta + " Email Toolchain",
+    " ***".magenta + "/\\".white + "\\/".magenta.bright + "*** ".magenta + " LambdaTool",
     "  ****".magenta + "/".magenta.bright + "***  ".magenta + " By Aaron Christiansen".black.bright,
     "    ****    ".magenta,
     "",

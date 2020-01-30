@@ -1,5 +1,5 @@
-module HSE
-  module Templating
+module LambdaTool
+  module EmailTemplating
     # Custom Redcarpet renderer with special <hr> styles.
     class HackSocRender < Redcarpet::Render::HTML
       def hrule

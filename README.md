@@ -1,10 +1,13 @@
-# HSE
-HSE (**H**ack**S**oc **E**mail) is an email generator used to create HackSoc
-emails, including newsletters.
+# LambdaTool
+
+![LambdaTool logo](logo/logo.svg)
+
+LambdaTool is an email generator used to create HackSoc emails, including
+newsletters.
 
 ## Markdown Format
-HSE uses a slightly modified Markdown format for emails, which is then compiled
-into HTML.
+LambdaTool uses a slightly modified Markdown format for emails, which is then
+compiled into HTML.
 
 The only addition on top of regular Markdown is the _section_, which is denoted
 by `%`. For example:
@@ -48,8 +51,8 @@ the weekly emails.
 
 ## Usage
 
-Before using HSE, create an `emails` folder. This is where the Markdown and
-compiled HTML for your emails will be stored. Created emails will be named:
+Before using LambdaTool, create an `emails` folder. This is where the Markdown
+and compiled HTML for your emails will be stored. Created emails will be named:
 
 ```
 (intended send date)-(name).(md|html)
@@ -62,19 +65,19 @@ Once you have done that, there are a variety of commands you can use:
 hse
 
 # Create a new email
-hse new week3
+lambdatool new week3
 
 # Build a specific email to HTML
-hse build 2020-01-20-week3
+lambdatool build 2020-01-20-week3
 
 # Build the latest email to HTML
-hse build latest
+lambdatool build latest
 
 # Build the latest email and open it in a Firefox
-hse open latest
+lambdatool open latest
 
 # Check the latest email for spelling mistakes or URLs which aren't hyperlinked
-hse lint latest
+lambdatool lint latest
 ```
 
 ## Configuration
@@ -86,7 +89,7 @@ name corrections which should take place automatically.
 ## Sending emails
 
 **You need to send emails entirely from Firefox**. This is awful, but it's the
-only way it appears to work. Run `hse open latest`, Ctrl+A the page, and paste
+only way it appears to work. Run `lambdatool open latest`, Ctrl+A the page, and paste
 it into a Gmail compose window. (If you do this in Chrome, you'll get a
 horizontal scroll bar and some wonky sizing.)
 

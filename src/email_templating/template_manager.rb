@@ -1,5 +1,5 @@
-module HSE
-  module Templating
+module LambdaTool
+  module EmailTemplating
     # Handles loading section and document templates.
     class TemplateManager
       TEMPLATE_DIR = "parts"

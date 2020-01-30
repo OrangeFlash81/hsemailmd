@@ -1,8 +1,8 @@
 require_relative 'hacksoc_render'
 require_relative 'section'
 
-module HSE
-  module Templating
+module LambdaTool
+  module EmailTemplating
     # A document with any number of sections.
     Document = Struct.new('Document', :sections) do
       # Creates a Document instance from the markup language described in README.

@@ -1,5 +1,5 @@
-module HSE
-  module Templating
+module LambdaTool
+  module EmailTemplating
     # Represents a section with a plaintext title and Markdown body.
     Section = Struct.new('Section', :title, :body) do
       # Renders the section into HTML.

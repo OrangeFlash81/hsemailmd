@@ -1,7 +1,7 @@
 require 'rainbow/refinement'
 using Rainbow
 
-module HSE
+module LambdaTool
   module CLI
     # Represents a command on the CLI.
     class Command
@@ -36,7 +36,7 @@ module HSE
       # Runs this command, passing the given arguments.
       # @param [Array<String>] args The arguments to pass to the block.
       def run(args)
-        die "Usage: hse #{name} #{usage}" unless expected_args == args.length || (expected_args.is_a?(Range) && expected_args.include?(args.length))
+        die "Usage: lambdatool #{name} #{usage}" unless expected_args == args.length || (expected_args.is_a?(Range) && expected_args.include?(args.length))
 
         instance_exec args, &action
       end

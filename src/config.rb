@@ -1,4 +1,4 @@
-# This is the HSE configuration file. 
+# This is the LambdaTool configuration file. 
 # It's just a Ruby script which is required by the main script, so you can
 # write code in here if you want to (for example, custom commands).
 
@@ -25,8 +25,8 @@ LINT_CUSTOM_WORDS = %w[
 
 # The commands available in the CLI.
 COMMANDS = [
-  HSE::CLI::NewCommand,
-  HSE::CLI::BuildCommand,
-  HSE::CLI::LintCommand,
-  HSE::CLI::OpenCommand,
+  LambdaTool::CLI::Email::NewCommand,
+  LambdaTool::CLI::Email::BuildCommand,
+  LambdaTool::CLI::Email::LintCommand,
+  LambdaTool::CLI::Email::OpenCommand,
 ]
