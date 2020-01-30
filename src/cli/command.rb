@@ -108,7 +108,9 @@ module HSE
           # If the path contains a dot, assume it's a name
           x
         else
-          "emails/#{x}.md"
+          result = "emails/#{x}.md"
+          result = "#{result[0...-3]}.#{format}" if format != :md
+          result
         end
       end
     end
