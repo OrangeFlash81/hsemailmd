@@ -5,7 +5,7 @@ require 'hunspell'
 module LambdaTool
   module CLI
     module Email
-      LintCommand = Command.new('lint', 'Check for mistakes', '(input | \'latest\')', 1) do |input, _|
+      LintCommand = Command.new('email', 'lint', 'Check for mistakes', '(input | \'latest\')', 1) do |input, _|
         input_filepath = arg_to_filepath(input)
         
         # Spellcheck with Hunspell

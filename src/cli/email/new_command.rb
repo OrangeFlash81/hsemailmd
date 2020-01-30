@@ -6,7 +6,7 @@ require 'open-uri'
 module LambdaTool
   module CLI
     module Email
-      NewCommand = Command.new('new', 'Create a new Markdown email with calendar events', '', 0) do
+      NewCommand = Command.new('email', 'new', 'Create a new Markdown email with calendar events', '', 0) do
         puts "Enter the " + "name".yellow + " of this email, in-this-format."
         name = input([
           ['Please enter a name.',            ->x{ x.strip != '' }],

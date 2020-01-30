@@ -5,9 +5,10 @@ module LambdaTool
   module CLI
     # Represents a command on the CLI.
     class Command
-      attr_reader :name, :description, :usage, :expected_args, :action
+      attr_reader :category, :name, :description, :usage, :expected_args, :action
 
       # Creates a new Command instance.
+      # @param [String] category The category which this command belongs to.
       # @param [String] name The name of this command, as it will be entered
       #   on the command line.
       # @param [String] description A single-line description of what this
@@ -18,7 +19,8 @@ module LambdaTool
       #   either as an exact number or a range.
       # @yieldparam [*String] One argument is passed to the block for each 
       #   argument passed to the command-line invocation.
-      def initialize(name, description, usage, expected_args, &action)
+      def initialize(category, name, description, usage, expected_args, &action)
+        @category = category
         @name = name
         @description = description
         @usage = usage
@@ -44,7 +46,7 @@ module LambdaTool
       # Generates the help line for this command from its name and description.
       # @return [String]
       def help_line
-        "  - #{name.blue.bright} - #{description}"
+        "  - #{"#{category} #{name}".blue.bright} - #{description}"
       end
 
       # Requests input from the user on STDIN. If validation rules are given,

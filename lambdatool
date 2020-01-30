@@ -16,10 +16,11 @@ require_relative 'src/cli/email/new_command'
 
 require_relative 'src/config'
 
-command = ARGV[0]
-commands_hash = COMMANDS.map { |x| [x.name, x] }.to_h
-if commands_hash[command]
-  commands_hash[command].run(ARGV[1..-1])
+category = ARGV[0]
+command = ARGV[1]
+commands_hash = COMMANDS.map { |x| [[x.category, x.name], x] }.to_h
+if commands_hash[[category, command]]
+  commands_hash[[category, command]].run(ARGV[2..-1])
 else
   puts [
     "    ****    ".magenta,
