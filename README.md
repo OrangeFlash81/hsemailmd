@@ -1,6 +1,10 @@
-# HackSoc EmailMD
-This is a tweaked variant of Markdown which can be used to create HackSoc
-weekly emails.
+# HSE
+HSE (**H**ack**S**oc **E**mail) is an email generator used to create HackSoc
+emails, including newsletters.
+
+## Markdown Format
+HSE uses a slightly modified Markdown format for emails, which is then compiled
+into HTML.
 
 The only addition on top of regular Markdown is the _section_, which is denoted
 by `%`. For example:
@@ -43,15 +47,48 @@ to make it suitable for dividing the items in the _"The Timetable"_ section of
 the weekly emails.
 
 ## Usage
-Use this as a command-line tool with one argument, the document to compile.
-After running `chmod +x hsemailmd.rb`, you can use this tool like so:
+
+Before using HSE, create an `emails` folder. This is where the Markdown and
+compiled HTML for your emails will be stored. Created emails will be named:
 
 ```
-./hsemailmd.rb <input-file> [output-file]
+(intended send date)-(name).(md|html)
 ```
 
-The output file argument is optional, and defaults to "x.html" for a file
-"x.md".
+Once you have done that, there are a variety of commands you can use:
+
+```bash
+# See all available commands
+hse
+
+# Create a new email
+hse new week3
+
+# Build a specific email to HTML
+hse build 2020-01-20-week3
+
+# Build the latest email to HTML
+hse build latest
+
+# Build the latest email and open it in a Firefox
+hse open latest
+
+# Check the latest email for spelling mistakes or URLs which aren't hyperlinked
+hse lint latest
+```
+
+## Configuration
+
+Settings can be changed in `src/config.rb`. The settings here include default
+event descriptions, explicitly allowed words for the linter, and any event
+name corrections which should take place automatically.
+
+## Sending emails
+
+**You need to send emails entirely from Firefox**. This is awful, but it's the
+only way it appears to work. Run `hse open latest`, Ctrl+A the page, and paste
+it into a Gmail compose window. (If you do this in Chrome, you'll get a
+horizontal scroll bar and some wonky sizing.)
 
 ## Things about emails
 
