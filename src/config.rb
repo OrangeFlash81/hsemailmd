@@ -15,7 +15,7 @@ EVENT_DESCRIPTIONS = {
   'CoffeeScript' => 'Our weekly social on Hes East; enjoy some lunch and have a good chat.',
   'Board Games and Cake' => "One of HackSoc's oldest traditions, where we play many board games and eat plenty of cake! Members are encouraged to bring their own board games and cake if they enjoy the events.",
   'HackPub' => 'Join us in the Rook and Gaskill and chat to members past and present over a pint (of something non-alcoholic, if you so desire).',
-  'Film Night' => 'Come and enjoy a film with fellow HackSoc members! Film suggestions are always welcome on Slack.'
+  'Film Night' => 'Come and enjoy a film with fellow HackSoc members! Submit your film suggestions to the [Film Night Portal](https://hacksoc-film-night.herokuapp.com/).'
 }
 
 # Custom words which the linter's spell checker specifically allows.
