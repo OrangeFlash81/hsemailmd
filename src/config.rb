@@ -2,6 +2,30 @@
 # It's just a Ruby script which is required by the main script, so you can
 # write code in here if you want to (for example, custom commands).
 
+# Require all of the commands you'll be using.
+require_relative 'cli/email/lint_command'
+require_relative 'cli/email/build_command'
+require_relative 'cli/email/open_command'
+require_relative 'cli/email/new_command'
+
+require_relative 'cli/talk_ad/json_command'
+
+# The commands available in the CLI.
+COMMANDS = [
+  LambdaTool::CLI::Email::NewCommand,
+  LambdaTool::CLI::Email::BuildCommand,
+  LambdaTool::CLI::Email::LintCommand,
+  LambdaTool::CLI::Email::OpenCommand,
+  LambdaTool::CLI::TalkAd::JsonCommand
+]
+
+# The folders that are expected to exist for commands. They will be created if
+# they don't.
+REQUIRED_FOLDERS = [
+  'emails',
+  'talk-ads'
+]
+
 # When creating a newsletter, events will have their name overridden if there is
 # a key of their original name.
 EVENT_NAMES = {
@@ -21,13 +45,4 @@ EVENT_DESCRIPTIONS = {
 # Custom words which the linter's spell checker specifically allows.
 LINT_CUSTOM_WORDS = %w[
   HackSoc RCH Lakehouse
-]
-
-# The commands available in the CLI.
-COMMANDS = [
-  LambdaTool::CLI::Email::NewCommand,
-  LambdaTool::CLI::Email::BuildCommand,
-  LambdaTool::CLI::Email::LintCommand,
-  LambdaTool::CLI::Email::OpenCommand,
-  LambdaTool::CLI::TalkAd::JsonCommand
 ]

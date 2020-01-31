@@ -71,9 +71,7 @@ If you're using `lambdatool talk-ad json`, the following format is expected:
 
 ## Usage
 
-Before using LambdaTool, create `emails` and `talk-ads` folders.
-
-Once you have done that, there are a variety of commands you can use:
+There are a variety of commands you can use:
 
 ```bash
 # See all available commands

@@ -9,14 +9,11 @@ require_relative 'src/email_templating/template_manager'
 
 require_relative 'src/cli/command'
 
-require_relative 'src/cli/email/lint_command'
-require_relative 'src/cli/email/build_command'
-require_relative 'src/cli/email/open_command'
-require_relative 'src/cli/email/new_command'
-
-require_relative 'src/cli/talk_ad/json_command'
-
 require_relative 'src/config'
+
+REQUIRED_FOLDERS.each do |required_folder|
+  FileUtils.mkdir_p(required_folder)
+end
 
 category = ARGV[0]
 command = ARGV[1]
