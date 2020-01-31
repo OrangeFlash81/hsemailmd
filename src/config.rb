@@ -29,4 +29,5 @@ COMMANDS = [
   LambdaTool::CLI::Email::BuildCommand,
   LambdaTool::CLI::Email::LintCommand,
   LambdaTool::CLI::Email::OpenCommand,
+  LambdaTool::CLI::TalkAd::JsonCommand
 ]

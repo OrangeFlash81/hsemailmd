@@ -2,10 +2,10 @@
 
 ![LambdaTool logo](logo/logo.svg)
 
-LambdaTool is an email generator used to create HackSoc emails, including
-newsletters.
+LambdaTool is an generator used to create HackSoc emails, newsletters, and
+talk adverts.
 
-## Markdown Format
+## Email Markdown Format
 LambdaTool uses a slightly modified Markdown format for emails, which is then
 compiled into HTML.
 
@@ -49,14 +49,29 @@ Another much less significant change is that `hr` now has some extra styling
 to make it suitable for dividing the items in the _"The Timetable"_ section of
 the weekly emails.
 
+## Talk Adverts
+
+Talk adverts are simply generated as HTML files, allowing them to be converted
+to a multitude of other formats.
+
+If you're using `lambdatool talk-ad json`, the following format is expected:
+
+```json
+{
+  "title": "What's Python really doing?",
+  "speaker": "Aaron Christiansen",
+  "date": "Thursday 30th January",
+  "timeStart": "19:00",
+  "timeEnd": "20:00",
+  "location": "the Pod",
+  "abstract": "Something something something...",
+  "speakerImage": "A base64 encoded image"
+}
+```
+
 ## Usage
 
-Before using LambdaTool, create an `emails` folder. This is where the Markdown
-and compiled HTML for your emails will be stored. Created emails will be named:
-
-```
-(intended send date)-(name).(md|html)
-```
+Before using LambdaTool, create `emails` and `talk-ads` folders.
 
 Once you have done that, there are a variety of commands you can use:
 
@@ -65,20 +80,27 @@ Once you have done that, there are a variety of commands you can use:
 hse
 
 # Create a new email
-lambdatool new week3
+lambdatool email new week3
 
 # Build a specific email to HTML
-lambdatool build 2020-01-20-week3
+lambdatool email build 2020-01-20-week3
 
 # Build the latest email to HTML
-lambdatool build latest
+lambdatool email build latest
 
 # Build the latest email and open it in a Firefox
-lambdatool open latest
+lambdatool email open latest
 
 # Check the latest email for spelling mistakes or URLs which aren't hyperlinked
-lambdatool lint latest
+lambdatool email lint latest
+
+# Generate an HTML talk advert
+echo "{ some json }" | lambdatool talk-ad json
 ```
+
+Created emails will be named `(intended send date)-(name).(md|html)`. Created
+talk adverts will be named `(date)-(speaker).html`, with both fields converted
+to lowercase and having whitespace replaced with dashes.
 
 ## Configuration
 

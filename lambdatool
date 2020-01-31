@@ -14,6 +14,8 @@ require_relative 'src/cli/email/build_command'
 require_relative 'src/cli/email/open_command'
 require_relative 'src/cli/email/new_command'
 
+require_relative 'src/cli/talk_ad/json_command'
+
 require_relative 'src/config'
 
 category = ARGV[0]
