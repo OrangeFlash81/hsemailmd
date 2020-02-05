@@ -50,7 +50,7 @@ module LambdaTool
 
             events_this_week << \
               "**#{event_name}** - _#{event_time}, #{event_weekday} " \
-              "#{event_date_obj.day}/#{event_date_obj.month}_ - " \
+              "#{event_date_obj.day.to_s.rjust(2, '0')}/#{event_date_obj.month.to_s.rjust(2, '0')}_ - " \
               "_#{event['location']}_\n\n#{event_description}"
           end
 
