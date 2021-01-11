@@ -15,7 +15,10 @@ GEM
       ice_cube (~> 0.16)
     ice_cube (0.16.3)
     minitest (5.12.2)
-    redcarpet (3.4.0)
+    parslet (1.8.2)
+    redcarpet (3.5.1)
+    ruby-handlebars (0.4.0)
+      parslet (~> 1.6, >= 1.6.2)
     thread_safe (0.3.6)
     tzinfo (1.2.5)
       thread_safe (~> 0.1)
@@ -29,6 +32,7 @@ DEPENDENCIES
   hunspell (~> 1.1)
   icalendar (~> 2.5)
   redcarpet
+  ruby-handlebars
 
 BUNDLED WITH
    2.0.2
